@@ -12,7 +12,8 @@ dependencies = [
     "pyHanko[opentype]>=0.18.0",
     "cryptography>=41.0.0",
     "pypdf>=5.4.0",
-    "PyPDF2>=2.1.1"
+    "PyPDF2>=2.1.1",
+    "qrcode>=8.1.0"
 ]
 
 [build-system]
