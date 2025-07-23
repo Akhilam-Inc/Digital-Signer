@@ -262,14 +262,14 @@ frappe.ui.form.on("Purchase Invoice", {
                                 freeze: true,
                                 freezeMessage : "Signing PDF... Please wait..",
                                 callback: function (r) {
-                                    if (!r.exc) {
+                                   if (!r.exc) {
                                         frappe.msgprint("Signed PDF attached successfully!");
                                         frm.reload_doc();
                                         console.log(r.message);
                                         
-                                        // if (r.message){
-                                        //     window.open(r.message, '_blank');
-                                        // }
+                                        if (r.message){
+                                            window.open(r.message, '_blank');
+                                        }
                                     }
                                 }
                             });

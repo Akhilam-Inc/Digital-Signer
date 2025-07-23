@@ -266,9 +266,9 @@ frappe.ui.form.on("Sales Order", {
                                         frm.reload_doc();
                                         console.log(r.message);
                                         
-                                        // if (r.message){
-                                        //     window.open(r.message, '_blank');
-                                        // }
+                                        if (r.message){
+                                            window.open(r.message, '_blank');
+                                        }
                                     }
                                 }
                             });
