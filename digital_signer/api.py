@@ -187,7 +187,7 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
     })
     file_doc.insert(ignore_permissions=True)
 
-    return file_doc.get_url()
+    return f"{frappe.utils.get_site_url()}{file_doc.file_url}"
 
 
 
@@ -306,7 +306,7 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
         })
         file_doc.insert(ignore_permissions=True)
 
-        return file_doc.get_url()
+        return f"{frappe.utils.get_site_url()}{file_doc.file_url}"
 
     except ValidationError:
         raise
