@@ -16,6 +16,7 @@
   "sign_address",
   "column_break_mhnpo",
   "url",
+  "print_format",
   "location"
  ],
  "fields": [
@@ -89,12 +90,19 @@
    "fieldname": "location",
    "fieldtype": "Data",
    "label": "Location (e.g. (345, 50, 545, 100))"
+  },
+  {
+   "fieldname": "print_format",
+   "fieldtype": "Link",
+   "label": "Default Print Format",
+   "options": "Print Format",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-22 17:12:41.959319",
+ "modified": "2025-07-23 16:29:28.690472",
  "modified_by": "Administrator",
  "module": "Digital Signer",
  "name": "Document Sign Setting",
@@ -111,6 +119,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

@@ -48,11 +48,10 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
 
     # Load digital signing configuration
     digi = frappe.get_doc("Document Sign Setting")
-
-    # Optional: Check entered password
     actual_password = digi.get_password('dsc_password')
-    if entered_password != actual_password:
-        frappe.throw("Password is wrong.")
+    # # Optional: Check entered password
+    # if entered_password != actual_password:
+    #     frappe.throw("Password is wrong.")
 
     # Load signer from .pfx file
     if digi.pfx_file_use:
@@ -183,14 +182,13 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
     file_doc = frappe.get_doc({
         "doctype": "File",
         "file_name": f"{sales_invoice.name}-signed.pdf",
-        "attached_to_doctype": doctype,
-        "attached_to_name": sales_invoice.name,
         "is_private": 1,
         "content": signed_pdf_io.getvalue(),
     })
     file_doc.insert(ignore_permissions=True)
 
-    return "success"
+    return file_doc.get_url()
+
 
 
 @frappe.whitelist()
@@ -206,8 +204,8 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
 
         digi = frappe.get_doc("Document Sign Setting")
         actual_password = digi.get_password('dsc_password')
-        if entered_password != actual_password:
-            frappe.throw("Password is wrong.")
+        # if entered_password != actual_password:
+        #     frappe.throw("Password is wrong.")
 
         # Load signer
         if digi.pfx_file_use:
@@ -303,14 +301,12 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
         file_doc = frappe.get_doc({
             "doctype": "File",
             "file_name": f"{sales_invoice.name}-signed.pdf",
-            "attached_to_doctype": doctype,
-            "attached_to_name": sales_invoice.name,
             "is_private": 1,
             "content": signed_pdf_io.getvalue(),
         })
         file_doc.insert(ignore_permissions=True)
 
-        return "success"
+        return file_doc.get_url()
 
     except ValidationError:
         raise
@@ -335,8 +331,6 @@ def save_signed_pdf(doctype,docname, signed_pdf_base64):
         file_doc = frappe.get_doc({
             "doctype": "File",
             "file_name": f"{docname}-signed.pdf",
-            "attached_to_doctype": doctype,
-            "attached_to_name": docname,
             "is_private": 1,
             "content": signed_file.read(),
         })
