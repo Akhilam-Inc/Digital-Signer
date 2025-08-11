@@ -56,9 +56,9 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
             passphrase=actual_password.encode()
         )
 
-        # TSA for long-term validity
-        tsa_url = "http://tsa1.emudhra.com"  # or tsa2.emudhra.com
-        timestamper = HTTPTimeStamper(tsa_url)
+        # # TSA for long-term validity
+        # tsa_url = "http://tsa1.emudhra.com"  # or tsa2.emudhra.com
+        # timestamper = HTTPTimeStamper(tsa_url)
 
         # Prepare PDF for signing
         input_pdf = BytesIO(pdf_content)
@@ -90,7 +90,6 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
             signature_meta,
             signer=signer,
             stamp_style=QRStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
-            timestamper=timestamper
         ).sign_pdf(reader, output)
 
         # Attach signed PDF to Frappe
