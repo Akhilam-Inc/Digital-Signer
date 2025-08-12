@@ -90,6 +90,7 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
             signature_meta,
             signer=signer,
             stamp_style=QRStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
+            timestamper=None
         ).sign_pdf(reader, output)
 
         # Attach signed PDF to Frappe
