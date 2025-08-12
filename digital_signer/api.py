@@ -355,7 +355,8 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
             signature_meta = PdfSignatureMetadata(
                 field_name=sig_field_spec.sig_field_name,
                 reason=f"Digitally signed on {doctype}",
-                location=digi.sign_address or "India"
+                location=digi.sign_address or "India",
+                md_algorithm='sha256',
             )
 
             pdf_signer = PdfSigner(
