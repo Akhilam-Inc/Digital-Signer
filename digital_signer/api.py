@@ -89,7 +89,7 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
         PdfSigner(
             signature_meta,
             signer=signer,
-            stamp_style=QRStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
+            stamp_style=TextStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
             timestamper=None
         ).sign_pdf(reader, output)
 
