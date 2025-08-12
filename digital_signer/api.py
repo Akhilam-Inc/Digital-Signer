@@ -7,7 +7,7 @@ from pyhanko.sign import signers, fields
 from pyhanko.sign.signers import PdfSigner, PdfSignatureMetadata
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
-from pyhanko.stamp import QRStampStyle
+from pyhanko.stamp import QRStampStyle, TextStampStyle
 from PyPDF2 import PdfReader
 import ast
 from frappe import ValidationError
