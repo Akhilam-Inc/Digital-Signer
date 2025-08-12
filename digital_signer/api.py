@@ -92,13 +92,13 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
             stamp_style=TextStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
             timestamper=None
         ).sign_pdf(reader, output)
-
+        signed_bytes = output.getvalue()
         # Attach signed PDF to Frappe
         file_doc = frappe.get_doc({
             "doctype": "File",
             "file_name": f"{sales_invoice_name}-signed.pdf",
             "is_private": 1,
-            "content": output.getvalue(),
+            "content": base64.b64encode(signed_bytes).decode("utf-8"),
         })
         file_doc.insert(ignore_permissions=True)
 
