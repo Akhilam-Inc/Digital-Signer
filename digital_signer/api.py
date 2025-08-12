@@ -33,8 +33,11 @@ def generate_invoice_pdf(doctype,docname):
 
 @frappe.whitelist()
 def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
+    """
+    Signs a PDF generated from a Frappe DocType with a digital signature using pyHanko.
+    """
     try:
-        # Load Sales Invoice PDF
+        # Load Sales Invoice PDF from Frappe
         pdf_content = frappe.get_print(
             doctype,
             sales_invoice_name,
@@ -42,72 +45,88 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None):
             as_pdf=True
         )
 
-        # Load DSC from Document Sign Setting
+        # Load DSC (Digital Signature Certificate) settings from Frappe DocType
         digi = frappe.get_doc("Document Sign Setting")
         actual_password = digi.get_password('dsc_password')
 
+        # Construct the path to the PFX file
         pfx_path = frappe.get_site_path(digi.pfx_file.lstrip("/"))
         if not os.path.exists(pfx_path):
             frappe.throw(f"PFX file not found: {pfx_path}")
 
-        # Load CA-issued DSC
+        # Load the CA-issued DSC from the PFX file
         signer = signers.SimpleSigner.load_pkcs12(
             pfx_path,
             passphrase=actual_password.encode()
         )
 
-        # # TSA for long-term validity
-        # tsa_url = "http://tsa1.emudhra.com"  # or tsa2.emudhra.com
-        # timestamper = HTTPTimeStamper(tsa_url)
+        # Prepare the PDF for signing using a BytesIO buffer
+        input_pdf_stream = BytesIO(pdf_content)
+        
+        # We need the page count, but will use IncrementalPdfFileWriter for the actual writing process.
+        # This is a safe way to get the number of pages without corrupting the stream for later use.
+        reader_for_pages = PdfReader(input_pdf_stream)
+        num_pages = len(reader_for_pages.pages)
+        input_pdf_stream.seek(0) # Reset stream position to the beginning for the writer
 
-        # Prepare PDF for signing
-        input_pdf = BytesIO(pdf_content)
-        num_pages = len(PdfReader(input_pdf).pages)
-        input_pdf.seek(0)
-
-        reader = IncrementalPdfFileWriter(input_pdf)
+        # Initialize the incremental writer with the input stream
+        writer = IncrementalPdfFileWriter(input_pdf_stream)
+        
+        # Define the signature field location and size
         box = ast.literal_eval(digi.location) if digi.location else (345, 50, 545, 100)
-        # Add signature field on last page
+        
+        # Add the signature field to the last page.
+        # We use 'on_page=-1' which is a more robust way to specify the last page
+        # as it doesn't rely on the 'num_pages' variable.
         sig_field_spec = SigFieldSpec(
             sig_field_name="Signature_Last_Page",
             box=box,
-            on_page=num_pages - 1
+            on_page=-1
         )
-        append_signature_field(reader, sig_field_spec)
+        append_signature_field(writer, sig_field_spec)
 
-        # Signature metadata
+        # Define the signature metadata
         signature_meta = PdfSignatureMetadata(
             field_name="Signature_Last_Page",
             reason=f"Digitally signed on {doctype}",
             location=digi.sign_address or "India"
         )
 
-        # Output buffer
-        output = BytesIO()
+        # Create an output buffer
+        output_stream = BytesIO()
 
-        # Sign PDF with TSA
+        # Sign the PDF and write the result to the output buffer
         PdfSigner(
             signature_meta,
             signer=signer,
             stamp_style=TextStampStyle(stamp_text="For: %(signer)s\nTime: %(ts)s"),
             timestamper=None
-        ).sign_pdf(reader, output)
-        signed_bytes = output.getvalue()
-        # Attach signed PDF to Frappe
+        ).sign_pdf(writer, output_stream)
+        
+        # Get the signed bytes from the output buffer
+        signed_bytes = output_stream.getvalue()
+        
+        # Close the streams to free up memory
+        input_pdf_stream.close()
+        output_stream.close()
+
+        # Attach the signed PDF to Frappe
         file_doc = frappe.get_doc({
             "doctype": "File",
             "file_name": f"{sales_invoice_name}-signed.pdf",
             "is_private": 1,
             "content": base64.b64encode(signed_bytes).decode("utf-8"),
+            "attached_to_doctype": doctype,
+            "attached_to_name": sales_invoice_name
         })
         file_doc.insert(ignore_permissions=True)
 
         return frappe.utils.get_url(file_doc.file_url)
+
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), f"{doctype} Digital Sign Error")
-        frappe.msgprint("Error log created.")
-        frappe.throw("You entered an incorrect password in Document Sign Setting, or the PFX file is invalid. Please check the error log for more details.")
-
+        frappe.msgprint(_("An error occurred during PDF signing. Please check the error log for more details."))
+        frappe.throw(_("You entered an incorrect password in Document Sign Setting, or the PFX file is invalid. Please check the error log for more details."))
 
 
 
