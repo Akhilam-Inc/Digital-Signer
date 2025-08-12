@@ -4,7 +4,7 @@ from frappe.utils.pdf import get_pdf
 import os
 from io import BytesIO
 from pyhanko.sign import signers, fields
-from pyhanko.sign.signers import PdfSigner, PdfSignatureMetadata
+from pyhanko.sign.signers import PdfSigner, PdfSignatureMetadata, DocMDPAccessPermissions
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.stamp import QRStampStyle
@@ -12,6 +12,7 @@ from PyPDF2 import PdfReader
 import ast
 from frappe import ValidationError
 from pyhanko.sign.timestamps import HTTPTimeStamper
+
 
 @frappe.whitelist()
 def generate_invoice_pdf(doctype,docname):
@@ -198,13 +199,15 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
                 reason=f"Digitally signed on {doctype}",
                 location=digi.sign_address or "India"
             )
-
+            tsa_url = "http://timestamp.digicert.com"  # replace with eMudhra’s TSA
+            timestamper = HTTPTimeStamper(tsa_url)
             pdf_signer = PdfSigner(
                 signature_meta,
                 signer=signer,
                 stamp_style=QRStampStyle(
                     stamp_text="For: %(signer)s\nTime: %(ts)s"
-                )
+                ),
+                timestamper=timestamper
             )
 
             pdf_signer.sign_pdf(
@@ -357,6 +360,8 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
                 reason=f"Digitally signed on {doctype}",
                 location=digi.sign_address or "India",
                 md_algorithm='sha256',
+                certify=True,  # This enables DocMDP
+                docmdp_permissions=DocMDPAccessPermissions.NO_CHANGES
             )
 
             pdf_signer = PdfSigner(
