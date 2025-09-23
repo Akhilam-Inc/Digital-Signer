@@ -14,6 +14,7 @@
   "section_break_jk2fi",
   "dsc_password",
   "sign_address",
+  "logo",
   "column_break_mhnpo",
   "url",
   "print_format",
@@ -97,12 +98,17 @@
    "label": "Default Print Format",
    "options": "Print Format",
    "reqd": 1
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach",
+   "label": "Logo"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-23 16:29:28.690472",
+ "modified": "2025-09-23 18:05:10.299664",
  "modified_by": "Administrator",
  "module": "Digital Signer",
  "name": "Document Sign Setting",
