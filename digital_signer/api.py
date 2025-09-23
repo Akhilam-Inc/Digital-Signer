@@ -809,7 +809,7 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
                 location=digi.sign_address or "India",
                 md_algorithm='sha256',
                 # certify=True,
-                docmdp_permissions=fields.MDPPerm.NO_CHANGES
+                # docmdp_permissions=fields.MDPPerm.NO_CHANGES
             )
             tsa_url = "http://timestamp.digicert.com"  # replace with valid TSA if provided
             timestamper = HTTPTimeStamper(tsa_url)
