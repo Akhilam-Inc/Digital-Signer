@@ -797,9 +797,9 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
 
             box = ast.literal_eval(digi.location) if digi.location else (345, 50, 545, 100)
             sig_field_spec = SigFieldSpec(
-                sig_field_name=f"Signature_Page_{i + 1}",
+                sig_field_name=f"Signature_Page_{page_num + 1}",
                 box=box,
-                on_page=i
+                on_page=page_num
             )
             append_signature_field(writer, sig_field_spec)
 
@@ -808,7 +808,7 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
                 reason=f"Digitally signed on {doctype}",
                 location=digi.sign_address or "India",
                 md_algorithm='sha256',
-                certify=True,
+                # certify=True,
                 docmdp_permissions=fields.MDPPerm.NO_CHANGES
             )
             tsa_url = "http://timestamp.digicert.com"  # replace with valid TSA if provided
