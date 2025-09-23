@@ -249,6 +249,7 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
             field_name=sig_field_spec.sig_field_name,
             reason=f"Digitally signed on {doctype}",
             location=digi.sign_address or "India"
+            certification_level=None
         )
         signer_display = digi.get("sign_address") or getattr(sales_invoice, "company", "Signer")
         stamp_text = f"Digitally Signed by\n{signer_display}\nTime: %(ts)s"
@@ -797,9 +798,9 @@ def sign_sales_invoice_pdf(doctype, sales_invoice_name, print_format_name=None, 
 
             box = ast.literal_eval(digi.location) if digi.location else (345, 50, 545, 100)
             sig_field_spec = SigFieldSpec(
-                sig_field_name=f"Signature_Page_{page_num + 1}",
+                sig_field_name=f"Signature_Page_{i + 1}",
                 box=box,
-                on_page=page_num
+                on_page=i
             )
             append_signature_field(writer, sig_field_spec)
 
