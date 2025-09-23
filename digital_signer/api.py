@@ -249,7 +249,6 @@ def sign_sales_invoice_pdfs(doctype,sales_invoice_name, print_format_name=None, 
             field_name=sig_field_spec.sig_field_name,
             reason=f"Digitally signed on {doctype}",
             location=digi.sign_address or "India"
-            certification_level=None
         )
         signer_display = digi.get("sign_address") or getattr(sales_invoice, "company", "Signer")
         stamp_text = f"Digitally Signed by\n{signer_display}\nTime: %(ts)s"
